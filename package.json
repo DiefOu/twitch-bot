@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "node-wav-player": "^0.2.0",
+    "tmi.js": "^1.7.5"
+  },
+  "name": "twitch-bot",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
