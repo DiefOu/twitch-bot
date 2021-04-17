@@ -1,5 +1,6 @@
 const tmi = require("tmi.js");
 const player = require("node-wav-player");
+const fs = require("fs");
 
 const opts = {
   options: {
@@ -18,13 +19,15 @@ const opts = {
 
 const client = new tmi.client(opts);
 
-const pingthreshold = 1800000; // 30 min, in milliseconds
+const pingthreshold = 900000; // 15 min, in milliseconds
+const replaycd = 20000; // the cooldown for the !replay command
 let lastmsgtime = 0; // first msg always pings, no matter how late into the stream
+let lastreplaycmdtime = 0;
 
 client.on("message", (channel, tags, message, self) => {
   if (self) return;
 
-  // Only send audio notif if its been longer than `pingthreshold` miliseconds since last msg
+  // Only send audio notif if its been longer than `pingthreshold` milliseconds since last msg
   if (
     tags["tmi-sent-ts"] - lastmsgtime >= pingthreshold &&
     tags.username.toLowerCase() !== "streamelements" // dont want it to ding twice if chatter put in a command for streamelements
@@ -40,7 +43,22 @@ client.on("message", (channel, tags, message, self) => {
   lastmsgtime = tags["tmi-sent-ts"];
 
   // Example chat command
-  /*   if (message.toLowerCase() === "!hello") {
+  if (message.toLowerCase() === "!replay") {
+    // client.say(channel, `@${tags.username}, Yo what's up`);
+    // Only allow the command to execute once every replaycd milliseconds
+    if (tags["tmi-sent-ts"] - lastreplaycmdtime >= replaycd) {
+      fs.appendFile('canishowreplay.txt', 'START INSTANT REPLAY \n', function (err) {
+        if (err) return console.log(err);
+        console.log('something wrong happened with the !replay command');
+      })
+    }
+    else {
+      client.say(channel, `@${tags.username}, the replay is already playing KEKW`);
+    }
+  }
+
+  // Example chat command
+  /* if (message.toLowerCase() === "!replay") {
     client.say(channel, `@${tags.username}, Yo what's up`);
   } */
 });
