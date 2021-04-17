@@ -51,9 +51,10 @@ client.on("message", (channel, tags, message, self) => {
         if (err) return console.log(err);
         console.log('something wrong happened with the !replay command');
       })
+      lastreplaycmdtime = tags["tmi-sent-ts"];
     }
     else {
-      client.say(channel, `@${tags.username}, the replay is already playing KEKW`);
+      client.say(channel, `@${tags.username}, the replay is already playing FeelsWeirdMan`);
     }
   }
 
