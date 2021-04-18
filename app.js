@@ -42,24 +42,29 @@ client.on("message", (channel, tags, message, self) => {
   }
   lastmsgtime = tags["tmi-sent-ts"];
 
-  // Example chat command
+  // Write to a file if someone types in the command, which should indirectly trigger the instant replay feature.
   if (message.toLowerCase() === "!replay") {
-    // client.say(channel, `@${tags.username}, Yo what's up`);
-    // Only allow the command to execute once every replaycd milliseconds
+    // Only allow the command to execute once every `replaycd` milliseconds
     if (tags["tmi-sent-ts"] - lastreplaycmdtime >= replaycd) {
-      fs.appendFile('canishowreplay.txt', 'START INSTANT REPLAY \n', function (err) {
-        if (err) return console.log(err);
-        console.log('something wrong happened with the !replay command');
-      })
+      fs.appendFile(
+        "canishowreplay.txt",
+        "START INSTANT REPLAY\n",
+        function (err) {
+          if (err) return console.log(err);
+          console.log("something wrong happened with the !replay command");
+        }
+      );
       lastreplaycmdtime = tags["tmi-sent-ts"];
-    }
-    else {
-      client.say(channel, `@${tags.username}, the replay is already playing FeelsWeirdMan`);
+    } else {
+      client.say(
+        channel,
+        `@${tags.username}, the replay is already playing FeelsWeirdMan`
+      );
     }
   }
 
   // Example chat command
-  /* if (message.toLowerCase() === "!replay") {
+  /* if (message.toLowerCase() === "!hello") {
     client.say(channel, `@${tags.username}, Yo what's up`);
   } */
 });
