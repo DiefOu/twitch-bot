@@ -63,6 +63,14 @@ client.on("message", (channel, tags, message, self) => {
     }
   }
 
+  // Chat command to explain what this bot is
+  if (message.toLowerCase() === "!bot") {
+    client.say(
+      channel,
+      `@diefoubot does things that @Streamelements can't YEP`
+    );
+  }
+
   // Example chat command
   /* if (message.toLowerCase() === "!hello") {
     client.say(channel, `@${tags.username}, Yo what's up`);
