@@ -88,7 +88,13 @@ client.on("message", (channel, tags, message, self) => {
       );
     } */
 
-    if (tags["tmi-sent-ts"] - lastreplaycmdtime < replaycd) {
+    if (currentScene === "INSTANT REPLAY") {
+      // Tells the user that a replay is already playing if it is on the "INSTANT REPLAY" scene in OBS
+      client.say(
+        channel,
+        `@${tags.username}, a replay is already playing FeelsWeirdMan`
+      );
+    } else if (tags["tmi-sent-ts"] - lastreplaycmdtime < replaycd) {
       // Tells chat to stop spamming the command if it has already been typed in chat once by anyone.
       client.say(
         channel,
@@ -96,19 +102,13 @@ client.on("message", (channel, tags, message, self) => {
           replaycd / 1000
         } second cooldown.`
       );
-    } else if (currentScene === "INSTANT REPLAY") {
-      // Tells the user that a replay is already playing if it is on the "INSTANT REPLAY" scene in OBS
-      client.say(
-        channel,
-        `@${tags.username}, a replay is already playing FeelsWeirdMan`
-      );
     } else {
       fs.appendFile(
         "canishowreplay.txt",
         "START INSTANT REPLAY\n",
         function (err) {
           if (err) return console.log(err);
-          console.log("something wrong happened with the !replay command");
+          // console.log("something wrong happened with the !replay command"); // This should be an ack msg
         }
       );
       lastreplaycmdtime = tags["tmi-sent-ts"];
