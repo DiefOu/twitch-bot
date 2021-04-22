@@ -50,7 +50,7 @@ obs.on("SwitchScenes", (data) => {
   currentScene = data.sceneName;
   if (currentScene === "INSTANT REPLAY") {
     let lastreplaycmdtime = new Date();
-    console.log(lastreplaycmdtime.toString());
+    console.log(lastreplaycmdtime);
   }
 });
 
@@ -58,7 +58,10 @@ client.on("message", (channel, tags, message, self) => {
   if (self) return;
 
   // Only send audio notif if its been longer than `pingthreshold` milliseconds since last msg
-  if (tags["tmi-sent-ts"] - lastmsgtime >= pingthreshold) {
+  if (
+    tags["tmi-sent-ts"] - lastmsgtime >= pingthreshold &&
+    !message.toLowerCase().startsWith("!")
+  ) {
     // This should ping twice on bot commands anymore... needs more testing
     player
       .play({
@@ -73,7 +76,7 @@ client.on("message", (channel, tags, message, self) => {
   // Write to a file if someone types in the command, which should indirectly trigger the instant replay feature.
   if (message.toLowerCase() === "!replay") {
     // Only allow the command to execute once every `replaycd` milliseconds
-    /* if (
+    if (
       tags["tmi-sent-ts"] - lastreplaycmdtime >= replaycd &&
       currentScene !== "INSTANT REPLAY"
     ) {
@@ -86,14 +89,21 @@ client.on("message", (channel, tags, message, self) => {
         }
       );
       lastreplaycmdtime = tags["tmi-sent-ts"];
+    } else if (tags["tmi-sent-ts"] - lastreplaycmdtime < replaycd) {
+      client.say(
+        channel,
+        `Stop spamming the command @chat, there's a ${
+          replaycd / 1000
+        } second cooldown.`
+      );
     } else {
       client.say(
         channel,
         `@${tags.username}, the replay is already playing FeelsWeirdMan`
       );
-    } */
+    }
 
-    if (currentScene === "INSTANT REPLAY") {
+    /* if (currentScene === "INSTANT REPLAY") {
       // Tells the user that a replay is already playing if it is on the "INSTANT REPLAY" scene in OBS
       client.say(
         channel,
@@ -117,7 +127,7 @@ client.on("message", (channel, tags, message, self) => {
         }
       );
       lastreplaycmdtime = tags["tmi-sent-ts"];
-    }
+    } */
   }
 
   // Chat command to explain what this bot is
