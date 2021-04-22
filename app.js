@@ -39,7 +39,7 @@ obs.on("error", (err) => {
   console.error("socket error:", err);
 });
 
-let currentScene;
+let currentScene; // Stores what the current scene is
 const pingthreshold = 1800000; // 30 min, in milliseconds
 const replaycd = 60000; // the cooldown for the !replay command (60 seconds) so it doesn't get spammed
 let lastmsgtime = 0; // first msg always pings, no matter how late into the stream
@@ -49,7 +49,7 @@ obs.on("SwitchScenes", (data) => {
   console.log(`New Active Scene: ${data.sceneName}`);
   currentScene = data.sceneName;
   if (currentScene === "INSTANT REPLAY") {
-    let lastreplaycmdtime = new Date();
+    let lastreplaycmdtime = new Date.now();
     console.log(lastreplaycmdtime);
   }
 });
@@ -76,7 +76,7 @@ client.on("message", (channel, tags, message, self) => {
   // Write to a file if someone types in the command, which should indirectly trigger the instant replay feature.
   if (message.toLowerCase() === "!replay") {
     // Only allow the command to execute once every `replaycd` milliseconds
-    if (
+    /* if (
       tags["tmi-sent-ts"] - lastreplaycmdtime >= replaycd &&
       currentScene !== "INSTANT REPLAY"
     ) {
@@ -101,9 +101,9 @@ client.on("message", (channel, tags, message, self) => {
         channel,
         `@${tags.username}, the replay is already playing FeelsWeirdMan`
       );
-    }
+    } */
 
-    /* if (currentScene === "INSTANT REPLAY") {
+    if (currentScene === "INSTANT REPLAY") {
       // Tells the user that a replay is already playing if it is on the "INSTANT REPLAY" scene in OBS
       client.say(
         channel,
@@ -123,11 +123,11 @@ client.on("message", (channel, tags, message, self) => {
         "START INSTANT REPLAY\n",
         function (err) {
           if (err) return console.log(err);
-          console.log("replay should be running right now"); // This should be an ack msg
+          console.log("Replay should be running right now?"); // This should be an ack msg
         }
       );
       lastreplaycmdtime = tags["tmi-sent-ts"];
-    } */
+    }
   }
 
   // Chat command to explain what this bot is
