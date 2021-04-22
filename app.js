@@ -102,19 +102,19 @@ client.on("message", (channel, tags, message, self) => {
       );
     } */
 
-    if (currentScene === "INSTANT REPLAY") {
+    if (tags["tmi-sent-ts"] - lastreplaycmdtime < replaycd) {
+      // Tells chat to stop spamming the command if it has already been typed in chat once by anyone.
+      client.say(
+        channel,
+        `Please wait ${
+          replaycd / 1000
+        } seconds before you can trigger the instant replay again.`
+      );
+    } else if (currentScene === "INSTANT REPLAY") {
       // Tells the user that a replay is already playing if it is on the "INSTANT REPLAY" scene in OBS
       client.say(
         channel,
         `@${tags.username}, a replay is already playing FeelsWeirdMan`
-      );
-    } else if (tags["tmi-sent-ts"] - lastreplaycmdtime < replaycd) {
-      // Tells chat to stop spamming the command if it has already been typed in chat once by anyone.
-      client.say(
-        channel,
-        `Stop spamming the command @chat, there's a ${
-          replaycd / 1000
-        } second cooldown.`
       );
     } else {
       fs.appendFile(
