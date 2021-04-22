@@ -20,6 +20,7 @@ const opts = {
 
 const client = new tmi.client(opts);
 const obs = new OBSWebSocket();
+
 obs
   .connect({
     address: "localhost:4444",
@@ -47,6 +48,10 @@ let lastreplaycmdtime = 0; // obviously the first time someone activates the ins
 obs.on("SwitchScenes", (data) => {
   console.log(`New Active Scene: ${data.sceneName}`);
   currentScene = data.sceneName;
+  if (currentScene === "INSTANT REPLAY") {
+    let lastreplaycmdtime = new Date();
+    console.log(lastreplaycmdtime);
+  }
 });
 
 client.on("message", (channel, tags, message, self) => {
