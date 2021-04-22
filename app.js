@@ -21,12 +21,22 @@ const opts = {
 const client = new tmi.client(opts);
 const obs = new OBSWebSocket();
 
+let currentScene; // Stores what the current scene is
+const pingthreshold = 1800000; // 30 min, in milliseconds
+const replaycd = 60000; // the cooldown for the !replay command (60 seconds) so it doesn't get spammed
+let lastmsgtime = 0; // first msg always pings, no matter how late into the stream
+let lastreplaycmdtime = 0; // obviously the first time someone activates the instant replay it goes off
+
 obs
   .connect({
     address: "localhost:4444",
   })
   .then(() => {
     console.log(`OBS Studio web sockets connected.`);
+    obs.send("GetCurrentScene").then((data) => {
+      currentScene = data.name;
+      console.log(data.name);
+    });
   })
   .catch((err) => {
     // Promise convention dicates you have a catch on every chain.
@@ -37,12 +47,6 @@ obs
 obs.on("error", (err) => {
   console.error("socket error:", err);
 });
-
-let currentScene; // Stores what the current scene is
-const pingthreshold = 1800000; // 30 min, in milliseconds
-const replaycd = 60000; // the cooldown for the !replay command (60 seconds) so it doesn't get spammed
-let lastmsgtime = 0; // first msg always pings, no matter how late into the stream
-let lastreplaycmdtime = 0; // obviously the first time someone activates the instant replay it goes off
 
 obs.on("SwitchScenes", (data) => {
   console.log(`New Active Scene: ${data.sceneName}`);
