@@ -50,7 +50,7 @@ obs.on("SwitchScenes", (data) => {
   currentScene = data.sceneName;
   if (currentScene === "INSTANT REPLAY") {
     let lastreplaycmdtime = new Date();
-    console.log(lastreplaycmdtime.toString);
+    console.log(lastreplaycmdtime.toString());
   }
 });
 
