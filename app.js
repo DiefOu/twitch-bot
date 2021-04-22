@@ -50,7 +50,7 @@ obs.on("SwitchScenes", (data) => {
   currentScene = data.sceneName;
   if (currentScene === "INSTANT REPLAY") {
     let lastreplaycmdtime = new Date();
-    console.log(lastreplaycmdtime);
+    console.log(lastreplaycmdtime.toString);
   }
 });
 
@@ -113,7 +113,7 @@ client.on("message", (channel, tags, message, self) => {
         "START INSTANT REPLAY\n",
         function (err) {
           if (err) return console.log(err);
-          // console.log("something wrong happened with the !replay command"); // This should be an ack msg
+          console.log("replay should be running right now"); // This should be an ack msg
         }
       );
       lastreplaycmdtime = tags["tmi-sent-ts"];
