@@ -48,7 +48,7 @@ obs.on("SwitchScenes", (data) => {
   console.log(`New Active Scene: ${data.sceneName}`);
   currentScene = data.sceneName;
   if (currentScene === "INSTANT REPLAY") {
-    let lastreplaycmdtime = new Date.now();
+    let lastreplaycmdtime = Date.now();
     console.log(lastreplaycmdtime.toString());
   }
 });
