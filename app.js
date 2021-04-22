@@ -1,6 +1,7 @@
 const tmi = require("tmi.js");
 const player = require("node-wav-player");
 const fs = require("fs");
+const OBSWebSocket = require("obs-websocket-js");
 
 const opts = {
   options: {
@@ -18,20 +19,42 @@ const opts = {
 };
 
 const client = new tmi.client(opts);
+const obs = new OBSWebSocket();
+obs
+  .connect({
+    address: "localhost:4444",
+    password: "password",
+  })
+  .then(() => {
+    console.log(`OBS Studio web sockets connected.`);
+  })
+  .catch((err) => {
+    // Promise convention dicates you have a catch on every chain.
+    console.log(err);
+  });
 
-const pingthreshold = 900000; // 15 min, in milliseconds
-const replaycd = 20000; // the cooldown for the !replay command
+// You must add this handler to avoid uncaught exceptions.
+obs.on("error", (err) => {
+  console.error("socket error:", err);
+});
+
+let currentScene;
+const pingthreshold = 1800000; // 30 min, in milliseconds
+const replaycd = 60000; // the cooldown for the !replay command (60 seconds) so it doesn't get spammed
 let lastmsgtime = 0; // first msg always pings, no matter how late into the stream
-let lastreplaycmdtime = 0;
+let lastreplaycmdtime = 0; // obviously the first time someone activates the instant replay it goes off
+
+obs.on("SwitchScenes", (data) => {
+  console.log(`New Active Scene: ${data.sceneName}`);
+  currentScene = data.sceneName;
+});
 
 client.on("message", (channel, tags, message, self) => {
   if (self) return;
 
   // Only send audio notif if its been longer than `pingthreshold` milliseconds since last msg
-  if (
-    tags["tmi-sent-ts"] - lastmsgtime >= pingthreshold &&
-    tags.username.toLowerCase() !== "streamelements" // dont want it to ding twice if chatter put in a command for streamelements
-  ) {
+  if (tags["tmi-sent-ts"] - lastmsgtime >= pingthreshold) {
+    // This should ping twice on bot commands anymore... needs more testing
     player
       .play({
         path: "./media/alert.wav",
@@ -45,7 +68,10 @@ client.on("message", (channel, tags, message, self) => {
   // Write to a file if someone types in the command, which should indirectly trigger the instant replay feature.
   if (message.toLowerCase() === "!replay") {
     // Only allow the command to execute once every `replaycd` milliseconds
-    if (tags["tmi-sent-ts"] - lastreplaycmdtime >= replaycd) {
+    /* if (
+      tags["tmi-sent-ts"] - lastreplaycmdtime >= replaycd &&
+      currentScene !== "INSTANT REPLAY"
+    ) {
       fs.appendFile(
         "canishowreplay.txt",
         "START INSTANT REPLAY\n",
@@ -60,6 +86,32 @@ client.on("message", (channel, tags, message, self) => {
         channel,
         `@${tags.username}, the replay is already playing FeelsWeirdMan`
       );
+    } */
+
+    if (tags["tmi-sent-ts"] - lastreplaycmdtime < replaycd) {
+      // Tells chat to stop spamming the command if it has already been typed in chat once by anyone.
+      client.say(
+        channel,
+        `Stop spamming the command @chat, there's a ${
+          replaycd / 1000
+        } second cooldown.`
+      );
+    } else if (currentScene === "INSTANT REPLAY") {
+      // Tells the user that a replay is already playing if it is on the "INSTANT REPLAY" scene in OBS
+      client.say(
+        channel,
+        `@${tags.username}, a replay is already playing FeelsWeirdMan`
+      );
+    } else {
+      fs.appendFile(
+        "canishowreplay.txt",
+        "START INSTANT REPLAY\n",
+        function (err) {
+          if (err) return console.log(err);
+          console.log("something wrong happened with the !replay command");
+        }
+      );
+      lastreplaycmdtime = tags["tmi-sent-ts"];
     }
   }
 
