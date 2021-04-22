@@ -24,7 +24,7 @@ const obs = new OBSWebSocket();
 obs
   .connect({
     address: "localhost:4444",
-    password: "password",
+    password: "gdss66gd",
   })
   .then(() => {
     console.log(`OBS Studio web sockets connected.`);
