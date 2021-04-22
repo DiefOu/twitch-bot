@@ -13,7 +13,7 @@ const opts = {
   },
   identity: {
     username: "DiefOubot",
-    password: "oauth:711266zyg0i93owuvzuc0x1ohovalp",
+    password: "oauth:da644859hqsy0hn4qref8k3zm3iw58",
   },
   channels: ["diefou"],
 };
