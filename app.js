@@ -116,6 +116,11 @@ client.on("message", (channel, tags, message, self) => {
         channel,
         `@${tags.username}, a replay is already playing FeelsWeirdMan`
       );
+    } else if (currentScene !== "Fullscreen Game") {
+      client.say(
+        channel,
+        `@${tags.username}, please use the command when the streamer is playing a game.`
+      );
     } else {
       fs.appendFile(
         "canishowreplay.txt",
