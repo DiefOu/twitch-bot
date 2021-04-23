@@ -83,7 +83,7 @@ client.on("message", (channel, tags, message, self) => {
       client.say(
         channel,
         `Please wait ${
-          replaycd - (Date.now() - lastreplaycmdtime) / 1000
+          (replaycd - (Date.now() - lastreplaycmdtime)) / 1000
         } seconds before you can trigger the instant replay again.`
       );
     } else if (currentScene === "INSTANT REPLAY") {
