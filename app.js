@@ -2,6 +2,7 @@ const tmi = require("tmi.js");
 const player = require("node-wav-player");
 const fs = require("fs");
 const OBSWebSocket = require("obs-websocket-js");
+const str = require("./strings.js");
 
 const opts = {
   options: {
@@ -11,10 +12,7 @@ const opts = {
     secure: true,
     reconnect: true,
   },
-  identity: {
-    username: "DiefOubot",
-    password: "oauth:rk32p2hn1i9iq8pfcptnpol02oqex6",
-  },
+  identity: str.botinfo,
   channels: ["diefou"],
 };
 
@@ -28,9 +26,7 @@ let lastmsgtime = 0; // first msg always pings, no matter how late into the stre
 let lastreplaycmdtime = 0; // obviously the first time someone activates the instant replay it goes off
 
 obs
-  .connect({
-    address: "localhost:4444",
-  })
+  .connect(str.obswebsocketinfo)
   .then(() => {
     console.log(`OBS Studio web sockets connected.`);
     obs.send("GetCurrentScene").then((data) => {
@@ -78,26 +74,6 @@ client.on("message", (channel, tags, message, self) => {
 
   // Write to a file if someone types in the command, which should indirectly trigger the instant replay feature.
   if (message.toLowerCase() === "!replay") {
-    /* if (tags["tmi-sent-ts"] - lastreplaycmdtime < replaycd) {
-      // Tells chat to stop spamming the command if it has already been typed in chat once by anyone.
-      client.say(
-        channel,
-        `Please wait ${
-          (replaycd - (Date.now() - lastreplaycmdtime)) / 1000
-        } seconds before the instant replay can be triggered again.`
-      );
-    } else if (currentScene === "INSTANT REPLAY") {
-      // Tells the user that a replay is already playing if it is on the "INSTANT REPLAY" scene in OBS
-      client.say(
-        channel,
-        `@${tags.username}, a replay is already playing FeelsWeirdMan`
-      );
-    } else if (currentScene !== "Fullscreen Game") {
-      client.say(
-        channel,
-        `@${tags.username}, please use the command when the streamer is playing a game.`
-      );
-    } else { */
     if (currentScene === "INSTANT REPLAY") {
       // Tells the user that a replay is already playing if it is on the "INSTANT REPLAY" scene in OBS
       client.say(
