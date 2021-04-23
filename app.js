@@ -35,7 +35,7 @@ obs
     console.log(`OBS Studio web sockets connected.`);
     obs.send("GetCurrentScene").then((data) => {
       currentScene = data.name;
-      console.log(data.name);
+      // console.log(data.name);
     });
   })
   .catch((err) => {
@@ -78,34 +78,6 @@ client.on("message", (channel, tags, message, self) => {
 
   // Write to a file if someone types in the command, which should indirectly trigger the instant replay feature.
   if (message.toLowerCase() === "!replay") {
-    // Only allow the command to execute once every `replaycd` milliseconds
-    /* if (
-      tags["tmi-sent-ts"] - lastreplaycmdtime >= replaycd &&
-      currentScene !== "INSTANT REPLAY"
-    ) {
-      fs.appendFile(
-        "canishowreplay.txt",
-        "START INSTANT REPLAY\n",
-        function (err) {
-          if (err) return console.log(err);
-          console.log("something wrong happened with the !replay command");
-        }
-      );
-      lastreplaycmdtime = tags["tmi-sent-ts"];
-    } else if (tags["tmi-sent-ts"] - lastreplaycmdtime < replaycd) {
-      client.say(
-        channel,
-        `Stop spamming the command @chat, there's a ${
-          replaycd / 1000
-        } second cooldown.`
-      );
-    } else {
-      client.say(
-        channel,
-        `@${tags.username}, the replay is already playing FeelsWeirdMan`
-      );
-    } */
-
     if (tags["tmi-sent-ts"] - lastreplaycmdtime < replaycd) {
       // Tells chat to stop spamming the command if it has already been typed in chat once by anyone.
       client.say(
@@ -131,7 +103,7 @@ client.on("message", (channel, tags, message, self) => {
         "START INSTANT REPLAY\n",
         function (err) {
           if (err) return console.log(err);
-          console.log("Replay should be running right now?"); // This should be an ack msg
+          console.log("Touch Portal fix ur shit man"); // This should be an ack msg
         }
       );
       lastreplaycmdtime = tags["tmi-sent-ts"];
