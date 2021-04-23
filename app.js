@@ -98,16 +98,16 @@ client.on("message", (channel, tags, message, self) => {
         `@${tags.username}, please use the command when the streamer is playing a game.`
       );
     } else { */
-    if (currentScene !== "Fullscreen Game") {
-      client.say(
-        channel,
-        `@${tags.username}, please use the command when the streamer is playing a game.`
-      );
-    } else if (currentScene === "INSTANT REPLAY") {
+    if (currentScene === "INSTANT REPLAY") {
       // Tells the user that a replay is already playing if it is on the "INSTANT REPLAY" scene in OBS
       client.say(
         channel,
         `@${tags.username}, a replay is already playing FeelsWeirdMan`
+      );
+    } else if (currentScene !== "Fullscreen Game") {
+      client.say(
+        channel,
+        `@${tags.username}, please use the command when the streamer is playing a game.`
       );
     } else if (tags["tmi-sent-ts"] - lastreplaycmdtime < replaycd) {
       // Tells chat to stop spamming the command if it has already been typed in chat once by anyone.
