@@ -52,8 +52,8 @@ obs.on("SwitchScenes", (data) => {
   console.log(`New Active Scene: ${data.sceneName}`);
   currentScene = data.sceneName;
   if (currentScene === "INSTANT REPLAY") {
-    let lastreplaycmdtime = Date.now();
-    console.log(lastreplaycmdtime.toString());
+    lastreplaycmdtime = Date.now();
+    // console.log(lastreplaycmdtime.toString());
   }
 });
 
@@ -65,7 +65,7 @@ client.on("message", (channel, tags, message, self) => {
     tags["tmi-sent-ts"] - lastmsgtime >= pingthreshold &&
     !message.toLowerCase().startsWith("!")
   ) {
-    // This should ping twice on bot commands anymore... needs more testing
+    // This should ping twice on bot commands...
     player
       .play({
         path: "./media/alert.wav",
@@ -83,7 +83,7 @@ client.on("message", (channel, tags, message, self) => {
       client.say(
         channel,
         `Please wait ${
-          replaycd / 1000
+          replaycd - (Date.now() - lastreplaycmdtime) / 1000
         } seconds before you can trigger the instant replay again.`
       );
     } else if (currentScene === "INSTANT REPLAY") {
@@ -103,7 +103,7 @@ client.on("message", (channel, tags, message, self) => {
         "START INSTANT REPLAY\n",
         function (err) {
           if (err) return console.log(err);
-          console.log("Touch Portal fix ur shit man"); // This should be an ack msg
+          console.log("Instant replay should be playing rn"); // This should be an ack msg
         }
       );
       lastreplaycmdtime = tags["tmi-sent-ts"];
