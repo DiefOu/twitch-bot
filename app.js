@@ -53,7 +53,6 @@ obs.on("SwitchScenes", (data) => {
   currentScene = data.sceneName;
   if (currentScene === "INSTANT REPLAY") {
     lastreplaycmdtime = Date.now();
-    // console.log(lastreplaycmdtime.toString());
   }
 });
 
@@ -84,7 +83,7 @@ client.on("message", (channel, tags, message, self) => {
         channel,
         `Please wait ${
           (replaycd - (Date.now() - lastreplaycmdtime)) / 1000
-        } seconds before you can trigger the instant replay again.`
+        } seconds before the instant replay can be triggered again.`
       );
     } else if (currentScene === "INSTANT REPLAY") {
       // Tells the user that a replay is already playing if it is on the "INSTANT REPLAY" scene in OBS
