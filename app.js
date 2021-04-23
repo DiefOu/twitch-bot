@@ -53,6 +53,7 @@ obs.on("SwitchScenes", (data) => {
   currentScene = data.sceneName;
   if (currentScene === "INSTANT REPLAY") {
     lastreplaycmdtime = Date.now();
+    // console.log(lastreplaycmdtime.toString());
   }
 });
 
@@ -77,7 +78,7 @@ client.on("message", (channel, tags, message, self) => {
 
   // Write to a file if someone types in the command, which should indirectly trigger the instant replay feature.
   if (message.toLowerCase() === "!replay") {
-    if (tags["tmi-sent-ts"] - lastreplaycmdtime < replaycd) {
+    /* if (tags["tmi-sent-ts"] - lastreplaycmdtime < replaycd) {
       // Tells chat to stop spamming the command if it has already been typed in chat once by anyone.
       client.say(
         channel,
@@ -95,6 +96,26 @@ client.on("message", (channel, tags, message, self) => {
       client.say(
         channel,
         `@${tags.username}, please use the command when the streamer is playing a game.`
+      );
+    } else { */
+    if (currentScene !== "Fullscreen Game") {
+      client.say(
+        channel,
+        `@${tags.username}, please use the command when the streamer is playing a game.`
+      );
+    } else if (currentScene === "INSTANT REPLAY") {
+      // Tells the user that a replay is already playing if it is on the "INSTANT REPLAY" scene in OBS
+      client.say(
+        channel,
+        `@${tags.username}, a replay is already playing FeelsWeirdMan`
+      );
+    } else if (tags["tmi-sent-ts"] - lastreplaycmdtime < replaycd) {
+      // Tells chat to stop spamming the command if it has already been typed in chat once by anyone.
+      client.say(
+        channel,
+        `Please wait ${
+          (replaycd - (Date.now() - lastreplaycmdtime)) / 1000
+        } seconds before the instant replay can be triggered again.`
       );
     } else {
       fs.appendFile(
