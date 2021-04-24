@@ -25,7 +25,7 @@ const replaycd = 60000; // the cooldown for the !replay command (60 seconds) so 
 let lastmsgtime = 0; // first msg always pings, no matter how late into the stream
 let lastreplaycmdtime = 0; // obviously the first time someone activates the instant replay it goes off
 
-let enablereplay = false; // Flag for enabling/disabling replay feature
+const enablereplay = false; // Flag for enabling/disabling replay feature
 
 obs
   .connect(str.obswebsocketinfo)
@@ -76,6 +76,7 @@ client.on("message", (channel, tags, message, self) => {
 
   // Write to a file if someone types in the command, which should indirectly trigger the instant replay feature.
   if (message.toLowerCase() === "!replay") {
+    // Only do anything if the replay flag is set to true.
     if (!enablereplay) {
       client.say(
         channel,
