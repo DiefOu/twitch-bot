@@ -25,6 +25,8 @@ const replaycd = 60000; // the cooldown for the !replay command (60 seconds) so 
 let lastmsgtime = 0; // first msg always pings, no matter how late into the stream
 let lastreplaycmdtime = 0; // obviously the first time someone activates the instant replay it goes off
 
+let enablereplay = false; // Flag for enabling/disabling replay feature
+
 obs
   .connect(str.obswebsocketinfo)
   .then(() => {
@@ -73,7 +75,7 @@ client.on("message", (channel, tags, message, self) => {
   lastmsgtime = tags["tmi-sent-ts"];
 
   // Write to a file if someone types in the command, which should indirectly trigger the instant replay feature.
-  if (message.toLowerCase() === "!replay") {
+  if (message.toLowerCase() === "!replay" && enablereplay) {
     if (currentScene === "INSTANT REPLAY") {
       // Tells the user that a replay is already playing if it is on the "INSTANT REPLAY" scene in OBS
       client.say(
