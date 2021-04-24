@@ -75,36 +75,43 @@ client.on("message", (channel, tags, message, self) => {
   lastmsgtime = tags["tmi-sent-ts"];
 
   // Write to a file if someone types in the command, which should indirectly trigger the instant replay feature.
-  if (message.toLowerCase() === "!replay" && enablereplay) {
-    if (currentScene === "INSTANT REPLAY") {
-      // Tells the user that a replay is already playing if it is on the "INSTANT REPLAY" scene in OBS
+  if (message.toLowerCase() === "!replay") {
+    if (!enablereplay) {
       client.say(
         channel,
-        `@${tags.username}, a replay is already playing FeelsWeirdMan`
-      );
-    } else if (currentScene !== "Fullscreen Game") {
-      client.say(
-        channel,
-        `@${tags.username}, please use the command when the streamer is playing a game.`
-      );
-    } else if (tags["tmi-sent-ts"] - lastreplaycmdtime < replaycd) {
-      // Tells chat to stop spamming the command if it has already been typed in chat once by anyone.
-      client.say(
-        channel,
-        `Please wait ${
-          (replaycd - (Date.now() - lastreplaycmdtime)) / 1000
-        } seconds before the instant replay can be triggered again.`
+        "The !replay command has been disabled until the streamer has a better computer or a 2 PC setup FeelsBadMan"
       );
     } else {
-      fs.appendFile(
-        "canishowreplay.txt",
-        "START INSTANT REPLAY\n",
-        function (err) {
-          if (err) return console.log(err);
-          console.log("Instant replay should be playing rn"); // This should be an ack msg
-        }
-      );
-      lastreplaycmdtime = tags["tmi-sent-ts"];
+      if (currentScene === "INSTANT REPLAY") {
+        // Tells the user that a replay is already playing if it is on the "INSTANT REPLAY" scene in OBS
+        client.say(
+          channel,
+          `@${tags.username}, a replay is already playing FeelsWeirdMan`
+        );
+      } else if (currentScene !== "Fullscreen Game") {
+        client.say(
+          channel,
+          `@${tags.username}, please use the command when the streamer is playing a game.`
+        );
+      } else if (tags["tmi-sent-ts"] - lastreplaycmdtime < replaycd) {
+        // Tells chat to stop spamming the command if it has already been typed in chat once by anyone.
+        client.say(
+          channel,
+          `Please wait ${
+            (replaycd - (Date.now() - lastreplaycmdtime)) / 1000
+          } seconds before the instant replay can be triggered again.`
+        );
+      } else {
+        fs.appendFile(
+          "canishowreplay.txt",
+          "START INSTANT REPLAY\n",
+          function (err) {
+            if (err) return console.log(err);
+            console.log("Instant replay should be playing rn"); // This should be an ack msg
+          }
+        );
+        lastreplaycmdtime = tags["tmi-sent-ts"];
+      }
     }
   }
 
