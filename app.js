@@ -4,6 +4,7 @@ const fs = require("fs");
 const OBSWebSocket = require("obs-websocket-js");
 const { Translate } = require("@google-cloud/translate").v2;
 const chen = require("./data/strings.js");
+const { type } = require("os");
 
 const opts = {
   options: {
@@ -31,6 +32,7 @@ const replaycd = 60000; // the cooldown for the !replay command (60 seconds) so 
 let lastmsgtime = 0; // first msg always pings, no matter how late into the stream
 let lastreplaycmdtime = 0; // obviously the first time someone activates the instant replay it goes off
 const enablereplay = false; // Flag for enabling/disabling replay feature
+let languages; // place to store language lookup table, not a const because async await is shit
 
 obs
   .connect(chen.obswebsocketinfo)
@@ -84,7 +86,6 @@ client.on("message", async (channel, tags, message, self) => {
   if (self) return;
 
   const msg = (await detectLanguage(message))[0];
-  const languages = await listLanguages();
   let msgTranslated;
   let fullLanguage;
   console.log(msg);
@@ -101,6 +102,7 @@ client.on("message", async (channel, tags, message, self) => {
         fullLanguage = language.name;
       }
     });
+    // Actually translates the text
     msgTranslated = (await translateText(msg.input))[0];
     client.say(
       channel,
@@ -177,8 +179,13 @@ client.on("message", async (channel, tags, message, self) => {
   } */
 });
 
-client.on("connected", (address, port) => {
+client.on("connected", async (address, port) => {
   console.log(`connected to ${address} and the port: ${port}`);
+  // fetching the language list when the bot connects on start
+  languages = await listLanguages().then((res) => {
+    console.log("Google Translate language list successfully retrieved");
+    return res;
+  });
 });
 
 client.connect();
