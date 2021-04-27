@@ -91,6 +91,7 @@ client.on("message", async (channel, tags, message, self) => {
   if (
     msg.language !== "en" &&
     msg.language !== "ja" &&
+    msg.language !== "und" &&
     msg.confidence >= 0.75
   ) {
     // Finding the full name of the language from the shortened language code
