@@ -61,19 +61,49 @@ obs.on("SwitchScenes", (data) => {
 });
 
 // See if the msg sent is in English, according to the Google Translate API
-async function detectLanguage(message) {
-  let [detections] = await translate.detect(message);
+async function detectLanguage(text) {
+  let [detections] = await translate.detect(text);
   detections = Array.isArray(detections) ? detections : [detections];
   return detections;
+}
+
+// The actual translation engine
+async function translateText(text) {
+  let [translations] = await translate.translate(text, "en");
+  translations = Array.isArray(translations) ? translations : [translations];
+  return translations;
+}
+
+async function listLanguages() {
+  const [languages] = await translate.getLanguages();
+  return languages;
 }
 
 client.on("message", async (channel, tags, message, self) => {
   if (self) return;
 
-  const msgTranslate = (await detectLanguage(message))[0];
-  console.log(msgTranslate);
-  if (msgTranslate.language === "en" && msgTranslate.confidence === 1) {
-    console.log("The previous message is in English, I think");
+  const msg = (await detectLanguage(message))[0];
+  const languages = await listLanguages();
+  let msgTranslated;
+  let fullLanguage;
+  console.log(msg);
+  // Translate the message if it's pretty clear it is in another language.
+  if (
+    msg.language !== "en" &&
+    msg.language !== "ja" &&
+    msg.confidence >= 0.75
+  ) {
+    // Finding the full name of the language from the shortened language code
+    languages.forEach((language) => {
+      if (language.code == msg.language) {
+        fullLanguage = language.name;
+      }
+    });
+    msgTranslated = (await translateText(msg.input))[0];
+    client.say(
+      channel,
+      `Message translated by Google Translate from ${fullLanguage}: ${msgTranslated}`
+    );
   }
 
   // Only send audio notif if its been longer than `pingthreshold` milliseconds since last msg
