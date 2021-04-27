@@ -74,6 +74,7 @@ async function translateText(text) {
   return translations;
 }
 
+// Fetching the langauge list for looking up the full language name
 async function listLanguages() {
   const [languages] = await translate.getLanguages();
   return languages;

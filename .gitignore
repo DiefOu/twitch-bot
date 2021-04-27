@@ -117,4 +117,4 @@ dist
 
 # Specifically for this project
 canishowreplay.txt
-data
+data/
