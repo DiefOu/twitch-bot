@@ -2,7 +2,8 @@ const tmi = require("tmi.js");
 const player = require("node-wav-player");
 const fs = require("fs");
 const OBSWebSocket = require("obs-websocket-js");
-const str = require("./strings.js");
+const { Translate } = require("@google-cloud/translate").v2;
+const chen = require("./data/strings.js");
 
 const opts = {
   options: {
@@ -12,23 +13,27 @@ const opts = {
     secure: true,
     reconnect: true,
   },
-  identity: str.botinfo,
+  identity: chen.botinfo,
   channels: ["diefou"],
 };
 
 const client = new tmi.client(opts);
 const obs = new OBSWebSocket();
+const translate = new Translate({
+  projectId: chen.projectId,
+  keyFilename: chen.keyFilename,
+});
 
+// Variables
 let currentScene; // Stores what the current scene is
 const pingthreshold = 1800000; // 30 min, in milliseconds
 const replaycd = 60000; // the cooldown for the !replay command (60 seconds) so it doesn't get spammed
 let lastmsgtime = 0; // first msg always pings, no matter how late into the stream
 let lastreplaycmdtime = 0; // obviously the first time someone activates the instant replay it goes off
-
 const enablereplay = false; // Flag for enabling/disabling replay feature
 
 obs
-  .connect(str.obswebsocketinfo)
+  .connect(chen.obswebsocketinfo)
   .then(() => {
     console.log(`OBS Studio web sockets connected.`);
     obs.send("GetCurrentScene").then((data) => {
@@ -55,8 +60,21 @@ obs.on("SwitchScenes", (data) => {
   }
 });
 
-client.on("message", (channel, tags, message, self) => {
+// See if the msg sent is in English, according to the Google Translate API
+async function detectLanguage(message) {
+  let [detections] = await translate.detect(message);
+  detections = Array.isArray(detections) ? detections : [detections];
+  return detections;
+}
+
+client.on("message", async (channel, tags, message, self) => {
   if (self) return;
+
+  const msgTranslate = (await detectLanguage(message))[0];
+  console.log(msgTranslate);
+  if (msgTranslate.language === "en" && msgTranslate.confidence === 1) {
+    console.log("The previous message is in English, I think");
+  }
 
   // Only send audio notif if its been longer than `pingthreshold` milliseconds since last msg
   if (

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@google-cloud/translate": "^6.2.0",
     "node-wav-player": "^0.2.0",
     "obs-websocket-js": "^4.0.2",
     "tmi.js": "^1.7.5"
