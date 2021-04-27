@@ -4,7 +4,6 @@ const fs = require("fs");
 const OBSWebSocket = require("obs-websocket-js");
 const { Translate } = require("@google-cloud/translate").v2;
 const chen = require("./data/strings.js");
-const { type } = require("os");
 
 const opts = {
   options: {
@@ -40,7 +39,6 @@ obs
     console.log(`OBS Studio web sockets connected.`);
     obs.send("GetCurrentScene").then((data) => {
       currentScene = data.name;
-      // console.log(data.name);
     });
   })
   .catch((err) => {
@@ -58,7 +56,6 @@ obs.on("SwitchScenes", (data) => {
   currentScene = data.sceneName;
   if (currentScene === "INSTANT REPLAY") {
     lastreplaycmdtime = Date.now();
-    // console.log(lastreplaycmdtime.toString());
   }
 });
 
@@ -86,8 +83,8 @@ client.on("message", async (channel, tags, message, self) => {
   if (self) return;
 
   const msg = (await detectLanguage(message))[0];
-  let msgTranslated;
-  let fullLanguage;
+  let msgTranslated; // stores translated message
+  let fullLanguage; // stores full name of language of original message
   console.log(msg);
   // Translate the message if it's pretty clear it is in another language.
   if (
@@ -170,7 +167,7 @@ client.on("message", async (channel, tags, message, self) => {
 
   // Chat command to explain what this bot is
   if (message.toLowerCase() === "!bot") {
-    client.say(channel, `I do things that @Streamelements can't YEP`);
+    client.say(channel, `I'm basically @Streamelements, but better YEP`);
   }
 
   // Example chat command
