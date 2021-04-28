@@ -82,7 +82,24 @@ async function listLanguages() {
 client.on("message", async (channel, tags, message, self) => {
   if (self) return;
 
-  const msg = (await detectLanguage(message))[0];
+  let msgFiltered = message; // where the final filtered message is placed
+  // Going through the emotes and filtering them out from the message
+  for (const emote in tags.emotes) {
+    // loop through each unique emote and slice it out from the message
+    const msglen = tags.emotes[emote].length;
+    for (let i = 0; i < msglen; i++) {
+      const indices = tags.emotes[emote][i];
+      // parse the start and end index of where the emote is in the string
+      const start = parseInt(indices.slice(0, indices.indexOf("-")));
+      const end = parseInt(
+        indices.slice(indices.indexOf("-") + 1, indices.length)
+      );
+      // This only removes the first instance of the emote in the message, but idc
+      msgFiltered = msgFiltered.replace(message.slice(start, end + 2), "");
+    }
+  }
+
+  const msg = (await detectLanguage(msgFiltered))[0];
   let msgTranslated; // stores translated message
   let fullLanguage; // stores full name of language of original message
   console.log(msg);
@@ -100,7 +117,8 @@ client.on("message", async (channel, tags, message, self) => {
       }
     });
     // Actually translates the text
-    msgTranslated = (await translateText(msg.input))[0];
+    msgTranslated = (await translateText(message))[0];
+    // Bot returns the translated text and what language it translated from in chat
     client.say(
       channel,
       `Message translated by Google Translate from ${fullLanguage}: ${msgTranslated}`
